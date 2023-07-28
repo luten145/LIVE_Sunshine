@@ -431,6 +431,8 @@ namespace platf {
 
   input_t
   input();
+  void lutenpackT();
+  void sendLutenPacket(char* packet, const touch_port_t &touch_port);
   void
   move_mouse(input_t &input, int deltaX, int deltaY);
   void

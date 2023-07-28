@@ -234,6 +234,42 @@ namespace platf {
     }
   }
 
+  typedef double (*DLL_PACK)(char* packet);
+  typedef double (*DLL_INIT)();
+
+  std::string path = "tools\\lutenpack.dll";
+  HMODULE hDll;
+  DLL_INIT pInita;
+  DLL_PACK inputPacket;
+
+  void lutenpackT(){
+    hDll = ::LoadLibraryA(path.c_str());
+    if(hDll != NULL ){
+    pInita = (DLL_INIT)::GetProcAddress(hDll, "init");
+    inputPacket = (DLL_PACK)::GetProcAddress(hDll, "inputPacket");
+    }
+
+    if(pInita == NULL){
+      return;
+    }
+    std::thread  touchThread(pInita);
+    touchThread.join();
+  }
+
+  void sendLutenPacket(char* packet, const touch_port_t &touch_port){
+    if(inputPacket == NULL){
+      return;
+    }
+    char pac[18];
+    pac[0] = 18;
+    pac[1] = 3;
+
+    memcpy(&pac[2], &touch_port,sizeof(touch_port));
+
+    inputPacket(pac);
+    inputPacket(packet);
+  }
+
   void
   abs_mouse(input_t &input, const touch_port_t &touch_port, float x, float y) {
     INPUT i {};

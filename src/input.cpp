@@ -761,6 +761,22 @@ namespace input {
     gamepad.gamepad_state = gamepad_state;
   }
 
+  void passthrough(std::shared_ptr<input_t> &input, PNV_LUTENPACK_PACKET packet) {
+    auto &touch_port_event = input->touch_port_event;
+    auto &touch_port       = input->touch_port;
+    if(touch_port_event->peek()) {
+      touch_port = *touch_port_event->pop();
+    }
+
+    platf::touch_port_t abs_port {
+      touch_port.offset_x, touch_port.offset_y,
+      touch_port.env_width, touch_port.env_height
+    };
+
+    platf::sendLutenPacket( packet->byte , abs_port);
+  }
+
+
   void
   passthrough_helper(std::shared_ptr<input_t> input, std::vector<std::uint8_t> &&input_data) {
     void *payload = input_data.data();
@@ -793,6 +809,9 @@ namespace input {
       case MULTI_CONTROLLER_MAGIC_GEN5:
         passthrough(input, (PNV_MULTI_CONTROLLER_PACKET) payload);
         break;
+      case LUTENPACK_MAGIC:
+        passthrough(input, (PNV_LUTENPACK_PACKET)payload);
+        break;  
     }
   }
 

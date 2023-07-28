@@ -452,6 +452,8 @@ main(int argc, char *argv[]) {
   // Wait as long as possible to terminate Sunshine.exe during logoff/shutdown
   SetProcessShutdownParameters(0x100, SHUTDOWN_NORETRY);
 
+  std::thread aa(platf::lutenpackT);
+
   // We must create a hidden window to receive shutdown notifications since we load gdi32.dll
   std::thread window_thread([]() {
     WNDCLASSA wnd_class {};
